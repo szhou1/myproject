@@ -1,44 +1,38 @@
-function getData(){
+var data;
+
+function getData() {
   console.log("getData()...");
 
-  //var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-  var query = 'count=2&q=%23beardown';
+  var url = 'https://api.foursquare.com/v2/venues/search?near=600%20Guererro%20st,%20San%20Francisco,%20CA&client_id=GRNE1GQUI5DF4ISNN2FYQVQDCV55GLNJG0BQFGZT3MZ25HA3&client_secret=XT3OKVHWZXJSAGT52ISZQHONFWGPUDEFFCZHJU3SVL3HKKLO&v=20160322';
 
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'https://api.twitter.com/1.1/search/tweets.json?' + query, true);
-  xhr.setRequestHeader('Authorization', 'OAuth oauth_consumer_key="LMo00AFrOFL3Wl4oPJgw6AX1B", auth_nonce="65de40c836b93dbe53ea03b98dedee9c", oauth_signature="LbveOuw3V98lVXLDxUKjygakXns%3D", auth_signature_method="HMAC-SHA1", oauth_timestamp="1458544078", oauth_token="1013771893-JGOhrEZjdn1L54qB58nMcRHCQj0yg1fmUIUEayM", oauth_version="1.0"');
-  xhr.onreadystatechange = function(){
-    var DONE = 4;
-    var OK = 200;
-    if(xhr.readyState === DONE){
-      if(xhr.status === OK){
-        console.log(xhr.responseText);
-      }else{
-        console.log('Error: ' + xhr.status);
-      }
-    }
-  };
+  xhr.addEventListener("load", reqListener);
+
+  xhr.open('GET', url, true);
+  xhr.setRequestHeader('Content-Type', 'text/plain');
   xhr.send();
 
-
-  console.log(xhr.status);
-  console.log(xhr.responseText);
-
+  // console.log("status: " + xhr.status);
 }
 
-getData();
+function reqListener () {
+  // console.log("this: " + this);
+  console.log("status: " + this.status)
+  console.log("response: " + this.responseText);
+  data = this.responseText;
+}
 
+function attachToElement(data){
+  console.log(document);
+  var ele = document.getElementById("listings");
+  console.log(document.getElementById("list1"));
+  ele.innerHTML = data;
+}
 
+var data = getData();
 
- // curl
-//  --get 'https://api.twitter.com/1.1/search/tweets.json'
-//  --data 'count=2&q=%23beardown'
-//  --header 'Authorization: OAuth
-//             oauth_consumer_key="LMo00AFrOFL3Wl4oPJgw6AX1B",
-//             oauth_nonce="65de40c836b93dbe53ea03b98dedee9c",
-//             oauth_signature="LbveOuw3V98lVXLDxUKjygakXns%3D",
-//             oauth_signature_method="HMAC-SHA1",
-//             oauth_timestamp="1458544078",
-//             oauth_token="1013771893-JGOhrEZjdn1L54qB58nMcRHCQj0yg1fmUIUEayM",
-//             oauth_version="1.0"'
-// --verbose
+window.onload = function(){
+  console.log("DATA: " + data);
+  attachToElement(data);
+
+};
