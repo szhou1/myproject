@@ -62,12 +62,9 @@ function geoFindMe() {
           console.log("you denied me :-(");
           document.getElementById("location").innerHTML = "geolocation blocked";
     });
-
-
-
 }
 
 function showPosition(position) {
-    ocument.getElementById("location").innerHTML = "Latitude: " + position.coords.latitude +
+    document.getElementById("location").innerHTML = "Latitude: " + position.coords.latitude +
     "<br>Longitude: " + position.coords.longitude;
 }
