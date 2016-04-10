@@ -6,7 +6,7 @@ var urlbase = 'https://api.foursquare.com/v2/';
 function getLocalVenues(loadEndListener){
   var address = "600%20Guererro%20st,%20San%20Francisco,%20CA";
   var categoryId = '4d4b7105d754a06374d81259'; // food categoryId
-  sendRequest('venues/search?near=' + address + '&categoryId=' + categoryId + '&limit=' + 5, loadEndListener);
+  sendRequest('venues/search?near=' + address + '&categoryId=' + categoryId + '&limit=' + 30, loadEndListener);
 }
 
 function getMenuByVenueId(venueId, loadEndListener){
@@ -122,6 +122,8 @@ function flattenMenu(items){
 
 window.onload = function(){
   console.log("onload() start");
+
+  getLocation();
 
   getLocalVenues(function(){
       attachToElement(this.responseText);
