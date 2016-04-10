@@ -16,9 +16,7 @@ function geocodeAddress() {
      var location = document.getElementById("location");
      location.innerHTML = ll.lat + ", " + ll.lng ;
 
-     getLocalVenues(ll, function(){
-         attachToElement(this.responseText);
-     });
+     getLocalVenues(ll);
   });
 
 }

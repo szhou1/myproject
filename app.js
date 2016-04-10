@@ -1,27 +1,48 @@
+'use strict';
 var clientId = 'GRNE1GQUI5DF4ISNN2FYQVQDCV55GLNJG0BQFGZT3MZ25HA3';
 var clientSecret = 'XT3OKVHWZXJSAGT52ISZQHONFWGPUDEFFCZHJU3SVL3HKKLO';
 var version = '20160322';
 var urlbase = 'https://api.foursquare.com/v2/';
 
-function getLocalVenues(ll, loadEndListener){
+function getLocalVenues(ll){
   // var address = "600%20Guererro%20st,%20San%20Francisco,%20CA";
   console.log(ll);
   var categoryId = '4d4b7105d754a06374d81259'; // food categoryId
-  sendRequest('venues/search?ll=' + ll.lat + "," + ll.lng + '&categoryId=' + categoryId + '&limit=' + 5, loadEndListener);
+  sendRequest('venues/search?ll=' + ll.lat + "," + ll.lng + '&categoryId=' + categoryId + '&limit=' + 3);
   // sendRequest('venues/search?near=' + address + '&categoryId=' + categoryId + '&limit=' + 5, loadEndListener);
 }
 
-function getMenuByVenueId(venueId, loadEndListener){
-  sendRequest('venues/' + venueId + "/menu?", loadEndListener);
+function getMenuByVenueId(venueId){
+  sendGenericRequest('venues/' + venueId + "/menu?");
 }
 
-function sendRequest(query, loadEndListener) {
+function sendGenericRequest(query, loadEndListener) {
+  var url = urlbase + query + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version;
+  var req = new XMLHttpRequest();
+  req.onreadystatechange = loadEndListener;
+  req.open('GET', url, true);
+  req.setRequestHeader('Content-Type', 'text/plain');
+  req.send();
+}
+
+function sendRequest(query) {
   // console.log("sendRequest() start");
   var url = urlbase + query + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version;
 
   var req = new XMLHttpRequest();
-  req.addEventListener("load", reqListener);
-  req.addEventListener("loadend", loadEndListener);
+  // req.addEventListener("load", reqListener);
+  // req.addEventListener("loadend", loadEndListener);
+  req.onreadystatechange = function (aEvt) {
+    if (req.readyState == 4) {
+       if(req.status == 200){
+         console.log("status is 200");
+         attachToElement(this.responseText);
+       }
+       else{
+         alert("Error loading page\n");
+       }
+    }
+  };
   req.open('GET', url, true);
   req.setRequestHeader('Content-Type', 'text/plain');
   req.send();
@@ -42,6 +63,7 @@ function attachToElement(data){
   var jsonData = JSON.parse(data);
   var response = jsonData.response;
   var venueList = response.venues;
+  console.log(venueList);
 
   var ul = document.createElement("ul");
   venueList.forEach(function(venue){
