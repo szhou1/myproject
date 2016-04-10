@@ -15,6 +15,10 @@ function geocodeAddress() {
     //  console.log("LAT: " + ll);
      var location = document.getElementById("location");
      location.innerHTML = ll.lat + ", " + ll.lng ;
+
+     getLocalVenues(ll, function(){
+         attachToElement(this.responseText);
+     });
   });
 
 }

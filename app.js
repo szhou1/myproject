@@ -3,10 +3,12 @@ var clientSecret = 'XT3OKVHWZXJSAGT52ISZQHONFWGPUDEFFCZHJU3SVL3HKKLO';
 var version = '20160322';
 var urlbase = 'https://api.foursquare.com/v2/';
 
-function getLocalVenues(loadEndListener){
-  var address = "600%20Guererro%20st,%20San%20Francisco,%20CA";
+function getLocalVenues(ll, loadEndListener){
+  // var address = "600%20Guererro%20st,%20San%20Francisco,%20CA";
+  console.log(ll);
   var categoryId = '4d4b7105d754a06374d81259'; // food categoryId
-  sendRequest('venues/search?near=' + address + '&categoryId=' + categoryId + '&limit=' + 5, loadEndListener);
+  sendRequest('venues/search?ll=' + ll.lat + "," + ll.lng + '&categoryId=' + categoryId + '&limit=' + 5, loadEndListener);
+  // sendRequest('venues/search?near=' + address + '&categoryId=' + categoryId + '&limit=' + 5, loadEndListener);
 }
 
 function getMenuByVenueId(venueId, loadEndListener){
@@ -36,7 +38,7 @@ function reqListener () {
 function attachToElement(data){
   console.log("attachToElement() start");
   var listingsEle = document.getElementById("listings");
-
+  listingsEle.innerHTML = "";
   var jsonData = JSON.parse(data);
   var response = jsonData.response;
   var venueList = response.venues;
@@ -101,9 +103,9 @@ window.onload = function(){
 
   geoFindMe();
 
-  getLocalVenues(function(){
-      attachToElement(this.responseText);
-  });
+  // getLocalVenues(function(){
+  //     attachToElement(this.responseText);
+  // });
 
   console.log("onload() end");
 };
