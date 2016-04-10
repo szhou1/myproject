@@ -1,19 +1,24 @@
 <!doctype html>
 <html>
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
 <script type="text/javascript" src="app.js"></script>
 <script type="text/javascript" src="geo.js"></script>
-
   <title>SquareMap</title>
   <header>
   </header>
 
   <body>
 
-    <div id="location">
+    <form onsubmit="geocodeAddress();" method="GET">
+      <label>Search location</label>
+        <input id="searchquery" type="text" placeholder="i.e Buenos Aires" value="" />
+      <button>Search</button>
+      <hr>
+      <a href="#" onclick="geoFindMe(); return false;">or use your location</a>
+    </form>
 
-    </div>
-    <div id="listings">
-    </div>
+    <div id="location"></div>
+    <div id="listings"></div>
 
   </body>
 
