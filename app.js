@@ -8,7 +8,13 @@ function getVenues(param){
   var searchterm = document.getElementById("searchVenues").value || param;
 
   var categoryId = '4d4b7105d754a06374d81259'; // food categoryId
-  var requestUrl = foursquareUrlBase + 'venues/search?near=' + encodeURI(searchterm) + '&categoryId=' + categoryId + '&limit=' + 10 + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version+ '&t=' + Math.random();
+  var requestUrl = foursquareUrlBase + 'venues/search?near=' + encodeURI(searchterm)
+        + '&categoryId=' + categoryId
+        + '&limit=' + 30
+        + '&client_id=' + clientId
+        + '&client_secret=' + clientSecret
+        + '&v=' + version
+        + '&t=' + Math.random();
 
   get(requestUrl)
     .then(JSON.parse, function(error) {
@@ -16,20 +22,30 @@ function getVenues(param){
      })
     .then(function(response){
       // console.log(response.response.venues);
-      attachToElement(response);
+      var hasMenuVenues = [];
+      response.response.venues.map(function(venue){
+        if(venue.hasMenu==true){
+          hasMenuVenues.push(venue);
+        }
+      });
+      console.log(hasMenuVenues);
+      attachToElement(hasMenuVenues);
     });
 }
 
-function attachToElement(data){
+function attachToElement(venueList){
   console.log("attachToElement() start");
+
   var listingsEle = document.getElementById("listings");
   listingsEle.innerHTML = "";
-  // var jsonData = JSON.parse(data);
-  var response = data.response;
-  var venueList = response.venues;
-  // console.log(venueList);
+
+  if(venueList.length <= 0){
+    var p = document.createElement("p").appendChild(document.createTextNode("No Menus Found for Venues Near This Location."));
+    listingsEle.appendChild(p);
+  }
 
   var ul = document.createElement("ul");
+
   venueList.forEach(function(venue){
     // create list items for menu items
     var ul_menu = document.createElement("ul");
@@ -40,6 +56,7 @@ function attachToElement(data){
       .then(function(response){
         // console.log(response);
         if(response.response.menu.menus.count > 0){
+          // console.log(hasMenu);
           var items = response.response.menu.menus.items;
           //console.log(items);
           var itemAndPriceArr = flattenMenu(items);
@@ -51,8 +68,7 @@ function attachToElement(data){
             ul_menu.appendChild(li);
           });
         }
-      });
-
+    });
     // create the list item for venue name
     var li = document.createElement("li");
     var text = document.createTextNode(venue.name);
@@ -86,7 +102,7 @@ function flattenMenu(items){
 
 
 function get(url) {
-  console.log("GET...  " + url);
+  // console.log("GET...  " + url);
 
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
