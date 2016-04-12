@@ -1,90 +1,58 @@
 'use strict';
-var clientId = 'GRNE1GQUI5DF4ISNN2FYQVQDCV55GLNJG0BQFGZT3MZ25HA3';
-var clientSecret = 'XT3OKVHWZXJSAGT52ISZQHONFWGPUDEFFCZHJU3SVL3HKKLO';
+var foursquareUrlBase = 'https://api.foursquare.com/v2/';
+var clientId = 'C1GWYNEMDEE51PKOWLVQA1P41BNL0YQYGWPLNVWGE4ESPAFR';
+var clientSecret = '4QBQMINO2VDDNVDDOGYIPKYZO04XUTK5YLBK0ARKSQ4OC3VD';
 var version = '20160322';
-var urlbase = 'https://api.foursquare.com/v2/';
 
-function getLocalVenues(ll){
-  // var address = "600%20Guererro%20st,%20San%20Francisco,%20CA";
-  console.log(ll);
+function getVenues(param){
+  var searchterm = document.getElementById("searchVenues").value || param;
+
   var categoryId = '4d4b7105d754a06374d81259'; // food categoryId
-  sendRequest('venues/search?ll=' + ll.lat + "," + ll.lng + '&categoryId=' + categoryId + '&limit=' + 3);
-  // sendRequest('venues/search?near=' + address + '&categoryId=' + categoryId + '&limit=' + 5, loadEndListener);
-}
+  var requestUrl = foursquareUrlBase + 'venues/search?near=' + encodeURI(searchterm) + '&categoryId=' + categoryId + '&limit=' + 10 + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version+ '&t=' + Math.random();
 
-function getMenuByVenueId(venueId){
-  sendGenericRequest('venues/' + venueId + "/menu?");
-}
-
-function sendGenericRequest(query, loadEndListener) {
-  var url = urlbase + query + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version;
-  var req = new XMLHttpRequest();
-  req.onreadystatechange = loadEndListener;
-  req.open('GET', url, true);
-  req.setRequestHeader('Content-Type', 'text/plain');
-  req.send();
-}
-
-function sendRequest(query) {
-  // console.log("sendRequest() start");
-  var url = urlbase + query + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version;
-
-  var req = new XMLHttpRequest();
-  // req.addEventListener("load", reqListener);
-  // req.addEventListener("loadend", loadEndListener);
-  req.onreadystatechange = function (aEvt) {
-    if (req.readyState == 4) {
-       if(req.status == 200){
-         console.log("status is 200");
-         attachToElement(this.responseText);
-       }
-       else{
-         alert("Error loading page\n");
-       }
-    }
-  };
-  req.open('GET', url, true);
-  req.setRequestHeader('Content-Type', 'text/plain');
-  req.send();
-
-  // console.log("sendRequest() end");
-}
-
-function reqListener () {
-  // console.log("reqListener() start");
-  // console.log("status: " + this.status)
-  // console.log("reqListener() end");
+  get(requestUrl)
+    .then(JSON.parse, function(error) {
+       console.error("Failed to get data", error);
+     })
+    .then(function(response){
+      // console.log(response.response.venues);
+      attachToElement(response);
+    });
 }
 
 function attachToElement(data){
   console.log("attachToElement() start");
   var listingsEle = document.getElementById("listings");
   listingsEle.innerHTML = "";
-  var jsonData = JSON.parse(data);
-  var response = jsonData.response;
+  // var jsonData = JSON.parse(data);
+  var response = data.response;
   var venueList = response.venues;
-  console.log(venueList);
+  // console.log(venueList);
 
   var ul = document.createElement("ul");
   venueList.forEach(function(venue){
     // create list items for menu items
     var ul_menu = document.createElement("ul");
 
-    getMenuByVenueId(venue.id, function(){
-      var response = JSON.parse(this.responseText);
-      if(response.response.menu.menus.count > 0){
-        var items = response.response.menu.menus.items;
-        //console.log(items);
-        var itemAndPriceArr = flattenMenu(items);
-        //console.log(itemAndPrice);
-        itemAndPriceArr.forEach(function(itemAndPrice){
-          var li = document.createElement("li");
-          var text = document.createTextNode(itemAndPrice.name + " - $" + itemAndPrice.price);
-          li.appendChild(text);
-          ul_menu.appendChild(li);
-        });
-      }
-    });
+    var url = foursquareUrlBase + 'venues/' + venue.id + "/menu?" + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version + '&t=' + Math.random();
+    get(url)
+      .then(JSON.parse)
+      .then(function(response){
+        // console.log(response);
+        if(response.response.menu.menus.count > 0){
+          var items = response.response.menu.menus.items;
+          //console.log(items);
+          var itemAndPriceArr = flattenMenu(items);
+          itemAndPriceArr.forEach(function(itemAndPrice){
+            // console.log(itemAndPrice);
+            var li = document.createElement("li");
+            var text = document.createTextNode(itemAndPrice.name + " - $" + itemAndPrice.price);
+            li.appendChild(text);
+            ul_menu.appendChild(li);
+          });
+        }
+      });
+
     // create the list item for venue name
     var li = document.createElement("li");
     var text = document.createTextNode(venue.name);
@@ -96,12 +64,8 @@ function attachToElement(data){
   console.log("attachToElement() end");
 }
 
-
-//
 function flattenMenu(items){
-
   var res = [];
-
   items.forEach(function(menu){
     //console.log(menu.entries.items);
       menu.entries.items.forEach(function(section){
@@ -120,14 +84,32 @@ function flattenMenu(items){
 }
 
 
-window.onload = function(){
-  console.log("onload() start");
 
-  geoFindMe();
+function get(url) {
+  console.log("GET...  " + url);
 
-  // getLocalVenues(function(){
-  //     attachToElement(this.responseText);
-  // });
+  return new Promise(function(resolve, reject) {
+    // Do the usual XHR stuff
+    // console.log("new promise...");
+    var req = new XMLHttpRequest();
+    req.open('GET', url, true);
 
-  console.log("onload() end");
-};
+    req.onload = function() {
+      // console.log("onload...");
+      if (req.status == 200) {
+        resolve(req.response);
+      }
+      else {
+        reject(Error(req.statusText));
+      }
+    };
+
+    // Handle network errors
+    req.onerror = function() {
+      reject(Error("Network Error"));
+    };
+
+    // Make the request
+    req.send();
+  });
+}
