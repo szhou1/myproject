@@ -5,38 +5,40 @@
 <script type="text/javascript" src="app.js"></script>
 <!-- <script type="text/javascript" src="geo.js"></script>
 <script type="text/javascript" src="map.js"></script> -->
+<link rel="stylesheet" type="text/css" href="app.css" >
 <!-- <link rel="stylesheet" type="text/css" href="map.css" > -->
   <title>SquareMap</title>
   <header>
   </header>
 
   <body>
-
-    <!-- <form onsubmit="searchAddress();" > -->
-      <!-- <label>Search location</label> -->
-        <!-- <input id="searchquery" type="text" placeholder="i.e. Buenos Aires" value="" /> -->
-      <!-- <button>Search</button> -->
-      <!-- <hr>
-      <a href="#" onclick="geoFindMe(); return false;">or use your location</a> -->
-    <!-- </form> -->
-
-    <label>Search Venues</label>
-    <input id="searchVenues" type="text" placeholder="i.e. Buenos Aires" value="" />
+    <!-- <label>Enter menu item </label>
+    <input id="searchMenuItem" type="text" placeholder="i.e. Steak Burrito" value="" />
+    <br /> -->
+    <label>Enter location </label>
+    <input id="searchVenues" type="text" placeholder="i.e. San Francisco" value="" />
     <button onclick="getVenues()">Search</button>
 
+    <div class="container vertical-divider">
+      <div class="column one-third">
+        <h2>Venues</h2>
+        <div id="listings">
+          <!-- <a onclick="getMenu()" href="#">Some Venue Here</a> -->
+        </div>
+      </div>
+
+      <div class="column one-third">
+        <h2>Menu</h2>
+        <div id="menu"></div>
+      </div>
+
+      <div class="column one-third">
+        <h2>Pictures</h2>
+      </div>
+    </div>
 
     <!-- <div id="location"></div> -->
-    <div id="listings"></div>
     <!-- <div id="map"></div> -->
-    <!-- <script>
-      var map;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: 8
-        });
-      }
-    </script> -->
   </body>
 
 </html>

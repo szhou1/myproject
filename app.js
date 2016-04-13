@@ -29,12 +29,12 @@ function getVenues(param){
         }
       });
       console.log(hasMenuVenues);
-      attachToElement(hasMenuVenues);
+      displayVenues(hasMenuVenues);
     });
 }
 
-function attachToElement(venueList){
-  console.log("attachToElement() start");
+function displayVenues(venueList){
+  console.log("displayVenues() start");
 
   var listingsEle = document.getElementById("listings");
   listingsEle.innerHTML = "";
@@ -44,40 +44,21 @@ function attachToElement(venueList){
     listingsEle.appendChild(p);
   }
 
-  var ul = document.createElement("ul");
+  var ol = document.createElement("ol");
 
   venueList.forEach(function(venue){
-    // create list items for menu items
-    var ul_menu = document.createElement("ul");
-
-    var url = foursquareUrlBase + 'venues/' + venue.id + "/menu?" + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version + '&t=' + Math.random();
-    get(url)
-      .then(JSON.parse)
-      .then(function(response){
-        // console.log(response);
-        if(response.response.menu.menus.count > 0){
-          // console.log(hasMenu);
-          var items = response.response.menu.menus.items;
-          //console.log(items);
-          var itemAndPriceArr = flattenMenu(items);
-          itemAndPriceArr.forEach(function(itemAndPrice){
-            // console.log(itemAndPrice);
-            var li = document.createElement("li");
-            var text = document.createTextNode(itemAndPrice.name + " - $" + itemAndPrice.price);
-            li.appendChild(text);
-            ul_menu.appendChild(li);
-          });
-        }
-    });
     // create the list item for venue name
     var li = document.createElement("li");
-    var text = document.createTextNode(venue.name);
-    li.appendChild(text);
-    li.appendChild(ul_menu);
-    ul.appendChild(li);
+    var a = document.createElement("a");
+    a.href = "#";
+    a.innerHTML = venue.name;
+    a.setAttribute("onclick", "getMenu(" + JSON.stringify(venue.id) + ")");
+
+    li.appendChild(a);
+    ol.appendChild(li);
   });
-  listingsEle.appendChild(ul);
-  console.log("attachToElement() end");
+  listingsEle.appendChild(ol);
+  console.log("displayVenues() end");
 }
 
 function flattenMenu(items){
@@ -93,16 +74,51 @@ function flattenMenu(items){
       });
     });
 
-  res.forEach(function(item){
-    //console.log(item);
-  });
   return res;
+}
+
+
+function getMenu(venueId){
+  console.log("getMenu... " + venueId);
+  var menu_ele = document.getElementById("menu");
+  menu_ele.innerHTML = "";
+  var ul_menu = document.createElement("ul");
+
+  var url = foursquareUrlBase + 'venues/' + venueId + "/menu?" + '&client_id=' + clientId + '&client_secret=' + clientSecret + '&v=' + version + '&t=' + Math.random();
+  get(url)
+    .then(JSON.parse)
+    .then(function(response){
+      // console.log(response);
+      if(response.response.menu.menus.count > 0){
+        // console.log(hasMenu);
+        var items = response.response.menu.menus.items;
+        //console.log(items);
+        var itemAndPriceArr = flattenMenu(items);
+        itemAndPriceArr.forEach(function(itemAndPrice){
+          // console.log(itemAndPrice);
+          var li = document.createElement("li");
+          if(itemAndPrice.price != undefined){
+            var text = document.createTextNode(itemAndPrice.name + " - $" + itemAndPrice.price);
+          }else{
+            var text = document.createTextNode(itemAndPrice.name);
+          }
+
+          li.appendChild(text);
+          ul_menu.appendChild(li);
+        });
+      }
+      else{
+        ul_menu.appendChild(document.createTextNode("No Menu Available"));
+      }
+  });
+
+  menu_ele.appendChild(ul_menu);
 }
 
 
 
 function get(url) {
-  // console.log("GET...  " + url);
+  console.log("GET...  " + url);
 
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
